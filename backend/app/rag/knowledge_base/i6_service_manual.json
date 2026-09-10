@@ -1,0 +1,51 @@
+[
+  {
+    "id": "dtc_p0300_p0306",
+    "category": "SAE J1939 / OBD-II DTC",
+    "dtc_code": "P0300 - P0306",
+    "title": "Cylinder 1 to 6 Misfire & Ignition/Injection Contribution Fault (P0300, P0301, P0302, P0303, P0304, P0305, P0306)",
+    "content": "SAE P0300 indicates random misfire. P0301 through P0306 indicate specific cylinder misfire (Cylinders 1-6). Firing order: 1-5-3-6-2-4. Troubleshooting Protocol: 1. Disconnect wiring harness connector at suspect cylinder; measure coil primary resistance (0.8-1.2 Ohm) and injector piezoelectric resistance (180-220 kOhm). 2. Swap ignition coil/injector from suspect cylinder to Cyl 1; re-log telemetry. If fault shifts, replace component. 3. Inspect spark plug gap (0.75 mm). 4. Compression test standard: Minimum 175 PSI across all cylinders with <10% variance. Torque spark plug to 23 Nm; coil bracket to 8 Nm; fuel rail bolts to 13 Nm."
+  },
+  {
+    "id": "dtc_p0299",
+    "category": "SAE J1939 / OBD-II DTC",
+    "dtc_code": "P0299",
+    "title": "Turbocharger / Charge Air System Underboost Condition (P0299)",
+    "content": "SAE P0299 triggers when actual manifold pressure is >20 kPa lower than target boost despite 95% Wastegate / VGT Duty Cycle command. Troubleshooting Protocol: 1. Pressurize intake charge air piping to 15 PSI using smoke leak detector. Inspect intercooler boots and charge pipes for tears or loose clamps (Torque hose clamps: 5.5 Nm). 2. Inspect VGT actuator linkage for mechanical binding. 3. Measure boost pressure sensor 5V reference voltage."
+  },
+  {
+    "id": "dtc_p0101",
+    "category": "SAE J1939 / OBD-II DTC",
+    "dtc_code": "P0101",
+    "title": "Mass Air Flow (MAF) Sensor Circuit Range & Calibration Drift (P0101)",
+    "content": "SAE P0101 triggers when MAF sensor output deviates >15% from ideal gas volume flow (m_dot = V_d * RPM * MAP * VE / 2RT). Troubleshooting Protocol: 1. Inspect MAF hot wire element for oil/dust buildup from air filter. Clean element using dedicated MAF sensor cleaner spray (do not touch wire directly). 2. Verify 5V reference and ground continuity. Replace MAF assembly if drift persists."
+  },
+  {
+    "id": "dtc_p0401",
+    "category": "SAE J1939 / OBD-II DTC",
+    "dtc_code": "P0401",
+    "title": "Exhaust Gas Recirculation (EGR) Flow & Valve Position Failure (P0401)",
+    "content": "SAE P0401 indicates EGR valve body carbon fouling or valve stuck open. Symptoms: Reduced manifold vacuum, elevated intake air temp (IAT), rough idle across all cylinders. Troubleshooting Protocol: 1. Remove EGR valve body; inspect seat for carbon blockage. Clean or replace EGR valve assembly (Torque mounting bolts: 22 Nm). 2. Perform ECU actuator position test."
+  },
+  {
+    "id": "dtc_p0087",
+    "category": "SAE J1939 / OBD-II DTC",
+    "dtc_code": "P0087",
+    "title": "High Pressure Fuel Pump (HPFP) Fuel Rail Pressure Drop (P0087)",
+    "content": "SAE P0087 triggers when common rail fuel pressure collapses under load (<150 bar idle, <1800 bar under load). Troubleshooting Protocol: 1. Check Low Pressure Fuel Pump (LPFP) in-tank supply pressure (Nominal 5.5 - 6.5 bar). 2. Inspect HPFP quantity control valve wiring. 3. Replace HPFP pump if high pressure collapses under boost."
+  },
+  {
+    "id": "dtc_p0217",
+    "category": "SAE J1939 / OBD-II DTC",
+    "dtc_code": "P0217",
+    "title": "Engine Coolant Over Temperature & Cylinder Head Gasket Breach (P0217)",
+    "content": "SAE P0217 indicates coolant temperature exceeding 110°C, often accompanied by adjacent cylinder compression drops (Cyl 2-3 or 4-5). Troubleshooting Protocol: 1. Perform chemical block test for combustion gas in cooling system. 2. Pressurize cooling circuit to 20 PSI and inspect cylinders with borescope. 3. Cylinder head bolt torque sequence: 40 Nm + 90° + 90°."
+  },
+  {
+    "id": "dtc_p0171_p0174",
+    "category": "SAE J1939 / OBD-II DTC",
+    "dtc_code": "P0171 / P0174",
+    "title": "System Too Lean - Bank 1 (Cyl 1-3) & Bank 2 (Cyl 4-6) Lean Trim Fault (P0171, P0174)",
+    "content": "SAE P0171 (Bank 1) and P0174 (Bank 2) indicate Lambda > 1.45 under load. Troubleshooting Protocol: 1. Check for unmetered air leaks downstream of MAF. 2. Check fuel injector spray pattern on affected bank. 3. Replace O2/Lambda sensor if calibration drift is verified."
+  }
+]
