@@ -60,10 +60,11 @@ export const downloadSyntheticCsvUrl = (faultType) => {
   return `${API_BASE}/generate-csv`;
 };
 
-export const sendChatMessage = async (message, diagnosticContext) => {
+export const sendChatMessage = async (message, diagnosticContext, history) => {
   const response = await axios.post(`${API_BASE}/chat`, {
     message,
     diagnostic_context: diagnosticContext,
+    history,
   });
   return response.data;
 };

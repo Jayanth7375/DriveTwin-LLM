@@ -95,6 +95,14 @@ export default function App() {
   const physicsSummary = analysisData?.physics_summary;
   const diagnosticReport = analysisData?.diagnostic_report;
 
+  const fullDiagnosticContext = {
+    ml_prediction: mlPred,
+    physics_summary: physicsSummary,
+    diagnostic_report: diagnosticReport,
+    filename: activeScenario || analysisData?.filename || 'ECU Telemetry Stream',
+    fault_type: activeScenario
+  };
+
   return (
     <div className="min-h-screen bg-[#0d1117] text-gray-100 flex font-sans selection:bg-cyan-500 selection:text-white">
       {/* LEFT SIDEBAR NAVIGATION */}
@@ -172,7 +180,7 @@ export default function App() {
                   <MessageSquare className="w-4 h-4 text-cyan-400" />
                   Interactive Mechanic AI Diagnostic Chat Assistant
                 </h3>
-                <InteractiveChat diagnosticContext={mlPred} />
+                <InteractiveChat diagnosticContext={fullDiagnosticContext} />
               </div>
             </div>
           )}
@@ -221,7 +229,7 @@ export default function App() {
           {/* PAGE 6: MECHANIC AI CHAT */}
           {activeTab === 'chat' && (
             <div className="max-w-5xl mx-auto">
-              <InteractiveChat diagnosticContext={mlPred} />
+              <InteractiveChat diagnosticContext={fullDiagnosticContext} />
             </div>
           )}
 

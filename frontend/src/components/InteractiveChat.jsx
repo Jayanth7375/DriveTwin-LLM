@@ -36,7 +36,7 @@ I am your domain-trained automotive AI diagnostic expert. Ask me anything about:
     setLoading(true);
 
     try {
-      const res = await sendChatMessage(userText, diagnosticContext);
+      const res = await sendChatMessage(userText, diagnosticContext, messages);
       setMessages((prev) => [
         ...prev,
         { id: Date.now() + 1, sender: 'bot', text: res.reply }
