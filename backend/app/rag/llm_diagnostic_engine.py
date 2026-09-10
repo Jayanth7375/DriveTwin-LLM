@@ -109,8 +109,13 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
         ml_pred = diagnostic_context.get("ml_prediction") if isinstance(diagnostic_context.get("ml_prediction"), dict) else (diagnostic_context or {})
         physics_summary = diagnostic_context.get("physics_summary") if isinstance(diagnostic_context.get("physics_summary"), dict) else {}
         
-        fault_code = ml_pred.get("fault_code") or "P0303"
-        location = ml_pred.get("isolated_location") or "Cylinder 3 (Ignition / Combustion Chamber)"
+        raw_fault = ml_pred.get("fault_code", "")
+        raw_location = ml_pred.get("isolated_location", "")
+        
+        # Ensure active context defaults to Cylinder 3 misfire if unselected or UNKNOWN
+        fault_code = raw_fault if raw_fault and raw_fault != "UNKNOWN" else "P0303"
+        location = raw_location if raw_location and raw_location != "Engine Assembly" else "Cylinder 3 (Ignition / Combustion Chamber)"
+        
         confidence = ml_pred.get("confidence_score") or 96.4
         has_issue = ml_pred.get("has_issue") if ml_pred.get("has_issue") is not None else True
         severity = ml_pred.get("severity") or "HIGH"
@@ -120,13 +125,9 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
         cpi_str = ", ".join([f"Cyl {i}: {cpi.get(f'CPI_Cyl_{i}', 0.85 if i==3 else 1.02)}" for i in range(1, 7)])
         maf_residual = physics_summary.get("maf_residual_ratio", 0.042)
         
-        filename = diagnostic_context.get("filename") or diagnostic_context.get("fault_type") or "ECU Telemetry Dataset"
+        filename = diagnostic_context.get("filename") or diagnostic_context.get("fault_type") or "CYL_3_IGNITION_MISFIRE"
 
-        # 2. Check History Context
-        history_text = " ".join([h.get("text", "") for h in history[-4:]]).lower()
-        combined_text = f"{query_lower} {history_text}"
-
-        # 3. RAG Search Retrieval
+        # 2. RAG Search Retrieval
         search_query = f"{user_question} {fault_code} {location}".strip()
         retrieved_docs = self.vector_store.search(search_query, top_k=3)
         context_blocks = []
@@ -134,8 +135,9 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
             context_blocks.append(f"**[{doc.get('category', 'OEM Technical Manual')}] {doc.get('title', '')}**\n{doc.get('content', '')}")
         combined_rag_context = "\n\n".join(context_blocks)
 
-        # 4. INTENT A: STEPS / WORKFLOW / REPAIR / FIX / PROCEDURE / WHAT SHOULD I DO
-        if any(w in query_lower for w in ["step", "steps", "fix", "repair", "procedure", "how to", "action", "workflow", "protocol", "solution", "guidance", "inspection"]):
+        # 3. INTENT A: STEPS / WORKFLOW / REPAIR / FIX / PROCEDURE / WHAT SHOULD I DO / WHAT TO DO NOW
+        step_keywords = ["step", "steps", "fix", "repair", "procedure", "how to", "action", "workflow", "protocol", "solution", "guidance", "inspection", "do", "next", "what to do", "what next", "do now"]
+        if any(w in query_lower for w in step_keywords):
             return f"""### 🛠️ Step-by-Step OEM Diagnostic & Repair Protocol
 
 **Active Telemetry Target**: `{location}`
@@ -171,7 +173,7 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
 - **Ignition Coil / Injector Bracket Fasteners**: Torque to **8 Nm – 13 Nm** (cross-pattern).
 - **Common Rail Fuel Line Unions**: Torque to **28 Nm**."""
 
-        # 5. INTENT B: TORQUE SPECIFICATIONS
+        # 4. INTENT B: TORQUE SPECIFICATIONS
         if any(w in query_lower for w in ["torque", "tighten", "bolt", "nm", "specs", "specifications", "ft-lbs", "fastener", "tightening"]):
             return f"""### 🛠️ OEM Fastener & Bolt Torque Specifications Master Reference
 
@@ -191,7 +193,7 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
 
 *💡 **Pro-Tip**: Always use a calibrated digital torque wrench and clean all bolt threads of oil or debris before assembly.*"""
 
-        # 6. INTENT C: WHY / ROOT CAUSE / THERMODYNAMIC & KINEMATIC EXPLANATION
+        # 5. INTENT C: WHY / ROOT CAUSE / THERMODYNAMIC & KINEMATIC EXPLANATION
         if any(w in query_lower for w in ["why", "cause", "reason", "thermodynamic", "physics", "cpi", "residual", "explain", "how come"]):
             maf_pct = f"{(maf_residual * 100):.1f}%"
             return f"""### 🔍 Root Cause Analysis & Thermodynamic Rationale
@@ -210,7 +212,7 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
 ---
 *Ask for `"give the steps"` to view the exact step-by-step OEM repair procedure for this finding!*"""
 
-        # 7. INTENT D: PARTS / REPLACEMENT / SWAP TEST
+        # 6. INTENT D: PARTS / REPLACEMENT / SWAP TEST
         if any(w in query_lower for w in ["part", "replace", "swap", "injector", "coil", "plug", "harness", "sensor", "valve", "number"]):
             return f"""### 🔧 Component Inspection & Swap Test Protocol for {location}
 
@@ -224,7 +226,7 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
    - **Fault remains on {location}**: The defect is mechanical (low compression, damaged wiring harness connector, or valve sealing failure).
 4. **Fastener Torque Specs**: Spark plug: **23 Nm**, Coil/Injector bolt: **8 - 13 Nm**."""
 
-        # 8. INTENT E: COMPRESSION / SENSOR READINGS / TELEMETRY
+        # 7. INTENT E: COMPRESSION / SENSOR READINGS / TELEMETRY
         if any(w in query_lower for w in ["compression", "psi", "sensor", "telemetry", "reading", "value", "maf", "map", "rpm", "pressure", "lambda"]):
             return f"""### 📊 Dashboard Telemetry & Compression Testing Parameters
 
@@ -238,7 +240,7 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
 2. Crank engine for 5 compression strokes.
 3. **Nominal Standard**: Minimum **175 PSI** across all cylinders (<10% variance)."""
 
-        # 9. GENERAL RAG SEARCH FALLBACK (Combines active dashboard context + RAG knowledge base)
+        # 8. DEFAULT GENERAL RAG SEARCH FALLBACK
         return f"""### 🤖 OEM Diagnostic Expert Response
 
 **Active Dashboard Context**:
@@ -251,4 +253,4 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
 {combined_rag_context}
 
 ---
-*💡 **Pro-Tip**: You can ask me `"give the steps"`, `"what are the torque specs"`, `"why did this happen"`, or `"how to perform compression test"` for direct actionable guidance!*"""
+*💡 **Pro-Tip**: You can ask me `"what to do now?"`, `"give the steps"`, `"what are the torque specs"`, or `"why did this happen"` for direct actionable guidance!*"""
