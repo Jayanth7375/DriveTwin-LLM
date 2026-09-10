@@ -112,14 +112,13 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
         raw_fault = ml_pred.get("fault_code", "")
         raw_location = ml_pred.get("isolated_location", "")
         
-        # Ensure active context defaults to Cylinder 3 misfire if unselected or UNKNOWN
+        # Default fallback to Cylinder 3 misfire if unselected
         fault_code = raw_fault if raw_fault and raw_fault != "UNKNOWN" else "P0303"
         location = raw_location if raw_location and raw_location != "Engine Assembly" else "Cylinder 3 (Ignition / Combustion Chamber)"
         
         confidence = ml_pred.get("confidence_score") or 96.4
         has_issue = ml_pred.get("has_issue") if ml_pred.get("has_issue") is not None else True
         severity = ml_pred.get("severity") or "HIGH"
-        subsystem = ml_pred.get("subsystem") or "Ignition / Cylinder Contribution"
         
         cpi = physics_summary.get("cpi_scores", {})
         cpi_str = ", ".join([f"Cyl {i}: {cpi.get(f'CPI_Cyl_{i}', 0.85 if i==3 else 1.02)}" for i in range(1, 7)])
@@ -130,12 +129,61 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
         # 2. RAG Search Retrieval
         search_query = f"{user_question} {fault_code} {location}".strip()
         retrieved_docs = self.vector_store.search(search_query, top_k=3)
-        context_blocks = []
-        for doc in retrieved_docs:
-            context_blocks.append(f"**[{doc.get('category', 'OEM Technical Manual')}] {doc.get('title', '')}**\n{doc.get('content', '')}")
-        combined_rag_context = "\n\n".join(context_blocks)
 
-        # 3. INTENT A: STEPS / WORKFLOW / REPAIR / FIX / PROCEDURE / WHAT SHOULD I DO / WHAT TO DO NOW
+        # 3. SMOKE SYMPTOMS (White Smoke, Black Smoke, Blue Smoke, Burning)
+        if any(w in query_lower for w in ["smoke", "fumes", "burning", "smell", "white smoke", "black smoke", "blue smoke"]):
+            return f"""### 💨 Exhaust & Engine Smoke Diagnostic Analysis
+
+**Active Vehicle Context**: `{location}` (`{fault_code}`, **{severity} Severity**)
+
+Smoke emitting from an engine indicates abnormal combustion, oil consumption, or coolant leakage into the cylinder:
+
+#### 1. ⚪ White Smoke (Sweet Smell)
+- **Primary Cause**: Engine coolant leaking into combustion chamber past a blown head gasket (`P0217`), cracked cylinder head, or leaking EGR cooler (`P0401`).
+- **Impact on {location}**: Coolant dilutes cylinder lubrication, causing misfire (`{fault_code}`) and zero power expansion stroke.
+- **Action**: **STOP ENGINE IMMEDIATELY**. Perform cooling system pressure test (20 PSI) and chemical block test for $CO_2$.
+
+#### 2. ⬛ Black Smoke (Soot / Fuel Odor)
+- **Primary Cause**: Incomplete diesel combustion (Excess fuel or air deficit).
+- **Triggers**: Turbocharge Underboost (`P0299`), Mass Air Flow drift (`P0101`), or stuck open EGR valve.
+- **Action**: Check intake charge air piping for boost leaks (torque clamps: **5.5 Nm**) and clean MAF sensor element.
+
+#### 3. 🔵 Blue / Gray Smoke (Oily Odor)
+- **Primary Cause**: Engine oil burning past worn piston rings, valve stem seals, or turbo turbine shaft seal.
+- **Action**: Check oil level, inspect spark plug / glow plug on **{location}** for oil fouling, and perform dry/wet compression test (min **175 PSI**)."""
+
+        # 4. NOISE & SHAKING / ROUGH IDLE
+        if any(w in query_lower for w in ["noise", "shake", "shaking", "vibrate", "vibration", "knock", "knocking", "rough", "rattle", "sound"]):
+            return f"""### 🔊 Engine Noise & Rough Shaking Diagnostic Guide
+
+**Active Vehicle Context**: `{location}` (`{fault_code}`)
+
+#### 1. 📳 Severe Engine Shaking / Rough Idle
+- **Root Cause**: Unbalanced crankshaft angular velocity impulses ($d\\omega/dt$).
+- The Inline-6 engine relies on a **120° power stroke interval** ($1-5-3-6-2-4$). When **{location}** misfires, it fails to produce power during its 120° stroke, causing severe engine vibration.
+- **Power Index**: `{cpi_str}`.
+
+#### 2. 🔨 Metallic Knocking Under Load
+- **Root Cause**: Piezoelectric fuel injector over-fueling, severe detonation, or worn connecting rod bearings.
+- **Diagnostic Step**: Perform an injector kill / swap test (swap injector from **{location}** to Cylinder 1)."""
+
+        # 5. SAFETY & DRIVING ADVICE
+        if any(w in query_lower for w in ["drive", "safe", "dangerous", "emergency", "stop", "should i stop"]):
+            return f"""### ⚠️ Operating Safety & Driving Guidance
+
+**Active Vehicle Status**: 🔴 **{severity} Severity Anomaly** on **{location}** (`{fault_code}`)
+
+#### 🚫 Can I continue driving?
+**NO**, it is **NOT recommended** to drive with an active `{fault_code}` misfire or boost leak on **{location}**.
+
+#### 💥 Risk Factors:
+1. **Hydro-Lock Risk**: If coolant is breaching **{location}**, liquid compression can bend connecting rods.
+2. **DPF & Catalyst Damage**: Unburnt fuel dumping into exhaust will melt the Diesel Particulate Filter (DPF) or catalytic converter.
+3. **Piston Scuffing**: Fuel wash down destroys cylinder wall oil film, causing permanent bore scoring.
+
+**Recommended Action**: Pull over safely, shut down engine, and perform the 4-step OEM diagnostic inspection."""
+
+        # 6. STEPS / WORKFLOW / REPAIR / FIX / PROCEDURE / WHAT TO DO NOW
         step_keywords = ["step", "steps", "fix", "repair", "procedure", "how to", "action", "workflow", "protocol", "solution", "guidance", "inspection", "do", "next", "what to do", "what next", "do now"]
         if any(w in query_lower for w in step_keywords):
             return f"""### 🛠️ Step-by-Step OEM Diagnostic & Repair Protocol
@@ -173,7 +221,7 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
 - **Ignition Coil / Injector Bracket Fasteners**: Torque to **8 Nm – 13 Nm** (cross-pattern).
 - **Common Rail Fuel Line Unions**: Torque to **28 Nm**."""
 
-        # 4. INTENT B: TORQUE SPECIFICATIONS
+        # 7. TORQUE SPECIFICATIONS
         if any(w in query_lower for w in ["torque", "tighten", "bolt", "nm", "specs", "specifications", "ft-lbs", "fastener", "tightening"]):
             return f"""### 🛠️ OEM Fastener & Bolt Torque Specifications Master Reference
 
@@ -193,7 +241,7 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
 
 *💡 **Pro-Tip**: Always use a calibrated digital torque wrench and clean all bolt threads of oil or debris before assembly.*"""
 
-        # 5. INTENT C: WHY / ROOT CAUSE / THERMODYNAMIC & KINEMATIC EXPLANATION
+        # 8. WHY / ROOT CAUSE / THERMODYNAMIC & KINEMATIC EXPLANATION
         if any(w in query_lower for w in ["why", "cause", "reason", "thermodynamic", "physics", "cpi", "residual", "explain", "how come"]):
             maf_pct = f"{(maf_residual * 100):.1f}%"
             return f"""### 🔍 Root Cause Analysis & Thermodynamic Rationale
@@ -212,45 +260,20 @@ The RAG LLM Diagnostic Engine identified a **{severity} severity anomaly** isola
 ---
 *Ask for `"give the steps"` to view the exact step-by-step OEM repair procedure for this finding!*"""
 
-        # 6. INTENT D: PARTS / REPLACEMENT / SWAP TEST
-        if any(w in query_lower for w in ["part", "replace", "swap", "injector", "coil", "plug", "harness", "sensor", "valve", "number"]):
-            return f"""### 🔧 Component Inspection & Swap Test Protocol for {location}
+        # 9. DYNAMIC CONVERSATIONAL RAG ANSWER FOR ANY OTHER QUESTION
+        best_doc = retrieved_docs[0] if retrieved_docs else {}
+        doc_title = best_doc.get('title', 'OEM Technical Service Manual')
+        doc_content = best_doc.get('content', 'Inspect electrical pinouts, compression levels, and intake manifold seals.')
 
-1. **Safety Preparation**: Disconnect vehicle battery negative terminal and allow high-pressure fuel rail to bleed pressure (<5 bar).
-2. **Component Swap Method**:
-   - Swap the ignition coil / fuel injector from **{location}** to **Cylinder 1**.
-   - Clear diagnostic fault codes using ECU scan tool.
-   - Re-run engine live telemetry generator or upload new ECU log file.
-3. **Diagnostic Conclusion**:
-   - **Fault moves to Cylinder 1**: The swapped component (coil/injector) is electrically or mechanically defective. Replace component.
-   - **Fault remains on {location}**: The defect is mechanical (low compression, damaged wiring harness connector, or valve sealing failure).
-4. **Fastener Torque Specs**: Spark plug: **23 Nm**, Coil/Injector bolt: **8 - 13 Nm**."""
-
-        # 7. INTENT E: COMPRESSION / SENSOR READINGS / TELEMETRY
-        if any(w in query_lower for w in ["compression", "psi", "sensor", "telemetry", "reading", "value", "maf", "map", "rpm", "pressure", "lambda"]):
-            return f"""### 📊 Dashboard Telemetry & Compression Testing Parameters
-
-- **Active File**: `{filename}`
-- **Isolated Anomaly**: **{location}** (`{fault_code}`)
-- **PINN Model Confidence**: **{confidence}%**
-- **Cylinder Power Index**: `{cpi_str}`
-
-#### 🧪 Compression Standard Protocol:
-1. Thread compression gauge into **{location}**.
-2. Crank engine for 5 compression strokes.
-3. **Nominal Standard**: Minimum **175 PSI** across all cylinders (<10% variance)."""
-
-        # 8. DEFAULT GENERAL RAG SEARCH FALLBACK
-        return f"""### 🤖 OEM Diagnostic Expert Response
+        return f"""### 🤖 OEM Diagnostic Expert Response to: "{user_question}"
 
 **Active Dashboard Context**:
-- **Vehicle Status**: { "🔴 **" + severity + " Anomaly Detected**" if has_issue else "🟢 **System Nominal**" }
-- **Isolated Location**: **{location}** (Fault Code: `{fault_code}`, Confidence: **{confidence}%**)
+- **Isolated Anomaly**: **{location}** (Fault Code: `{fault_code}`, Confidence: **{confidence}%**)
 - **Data File**: `{filename}`
 
-#### 📚 Relevant OEM Technical Service Manual Knowledge:
-
-{combined_rag_context}
+#### 📖 Technical Analysis & RAG Findings:
+- **{doc_title}**:
+{doc_content}
 
 ---
-*💡 **Pro-Tip**: You can ask me `"what to do now?"`, `"give the steps"`, `"what are the torque specs"`, or `"why did this happen"` for direct actionable guidance!*"""
+*💡 **Quick Follow-ups**: Ask me `"theres a smoke coming"`, `"what to do now?"`, `"what are the torque specs"`, or `"is it safe to drive?"` for instant targeted guidance!*"""

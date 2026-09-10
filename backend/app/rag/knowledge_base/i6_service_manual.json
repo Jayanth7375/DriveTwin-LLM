@@ -39,7 +39,7 @@
     "category": "SAE J1939 / OBD-II DTC",
     "dtc_code": "P0217",
     "title": "Engine Coolant Over Temperature & Cylinder Head Gasket Breach (P0217)",
-    "content": "SAE P0217 indicates coolant temperature exceeding 110°C, often accompanied by adjacent cylinder compression drops (Cyl 2-3 or 4-5). Troubleshooting Protocol: 1. Perform chemical block test for combustion gas in cooling system. 2. Pressurize cooling circuit to 20 PSI and inspect cylinders with borescope. 3. Cylinder head bolt torque sequence: 40 Nm + 90° + 90°."
+    "content": "SAE P0217 indicates coolant temperature exceeding 110°C, often accompanied by adjacent cylinder compression drops (Cyl 2-3 or 4-5). Troubleshooting Protocol: 1. Perform chemical block test for combustion gas in cooling system. 2. Pressurize cooling circuit to 20 PSI and inspect cylinders with borescope. 3. Cylinder head bolt torque sequence: 40 Nm + 90 degrees + 90 degrees."
   },
   {
     "id": "dtc_p0171_p0174",
@@ -70,10 +70,24 @@
     "content": "Mechanical Dry Compression Test Procedure: 1. Disable fuel injection system and remove all 6 spark plugs / glow plugs. 2. Thread compression gauge into Cyl 1. Crank engine for 5 compression strokes (approx 4 seconds). 3. Nominal Standard: Minimum 175 PSI across all cylinders. Maximum allowable variance between cylinders is <10%. 4. If low (<150 PSI), perform Wet Compression Test by adding 10ml motor oil into combustion chamber. If pressure rises, piston rings are worn. If pressure stays low, valves or head gasket breached."
   },
   {
-    "id": "system_hardware_stack",
-    "category": "AI Execution Stack",
-    "dtc_code": "HARDWARE_STACK",
-    "title": "PyTorch CUDA GPU & RAG Architecture Details",
-    "content": "AI Execution Stack: Multi-class XGBoost + Random Forest ensemble with Platt-scaled confidence calibration (0-100%). Neural Physics PINN model built on PyTorch CUDA GPU acceleration (auto-detects NVIDIA GPUs). RAG Vector Engine uses ChromaDB / SentenceTransformers (all-MiniLM-L6-v2) for OEM manual semantic retrieval. Local LLM: Hugging Face Qwen 2.5 Coder 1.5B / TinyLlama."
+    "id": "smoke_diagnostics",
+    "category": "Exhaust & Engine Smoke Symptom Analysis",
+    "dtc_code": "SMOKE_DIAG",
+    "title": "Exhaust Smoke Diagnostic Guide: White, Black, and Blue Smoke Symptoms",
+    "content": "Exhaust Smoke Diagnosis: 1. WHITE SMOKE: Indicates coolant entering combustion chamber (Head Gasket Breach P0217 or cracked cylinder head / liner). Sweet smell. Perform cooling system pressure test (20 PSI) and chemical block test. 2. BLACK SMOKE: Indicates unburnt diesel fuel / rich mixture due to insufficient air (Turbo Boost Leak P0299, MAF drift P0101, or stuck open EGR valve P0401). 3. BLUE / GRAY SMOKE: Indicates engine oil burning past worn piston rings, valve stem seals, or turbocharger turbine shaft seal."
+  },
+  {
+    "id": "noise_vibration_diagnostics",
+    "category": "Engine Noise & Vibration Symptom Analysis",
+    "dtc_code": "NOISE_DIAG",
+    "title": "Engine Knocking, Misfire Vibration & Mechanical Noise Diagnostics",
+    "content": "Engine Noise & Shaking Diagnostics: Severe vibration / engine shaking indicates unbalanced crankshaft torque impulses from a dead cylinder misfire (P0300-P0306). Metallic knocking under load indicates fuel injector over-fueling or rod bearing wear. Perform cylinder contribution / power balance test by disabling injectors one by one."
+  },
+  {
+    "id": "safety_and_driving",
+    "category": "Emergency & Driving Safety Guidance",
+    "dtc_code": "SAFETY_GUIDE",
+    "title": "Vehicle Operating Safety & Emergency Shutdown Protocol",
+    "content": "Emergency Safety Guidance: If white smoke, engine knocking, or severe misfire (P0303 / P0217) occurs, SHUT DOWN ENGINE IMMEDIATELY. Continuing to drive with coolant in cylinders or raw unburnt diesel fuel will cause hydro-lock, catastrophic piston ring land destruction, cylinder wall scoring, or DPF melt-down."
   }
 ]
