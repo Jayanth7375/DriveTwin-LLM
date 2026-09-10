@@ -47,5 +47,33 @@
     "dtc_code": "P0171 / P0174",
     "title": "System Too Lean - Bank 1 (Cyl 1-3) & Bank 2 (Cyl 4-6) Lean Trim Fault (P0171, P0174)",
     "content": "SAE P0171 (Bank 1) and P0174 (Bank 2) indicate Lambda > 1.45 under load. Troubleshooting Protocol: 1. Check for unmetered air leaks downstream of MAF. 2. Check fuel injector spray pattern on affected bank. 3. Replace O2/Lambda sensor if calibration drift is verified."
+  },
+  {
+    "id": "torque_specs_master",
+    "category": "OEM Fastener Torque Specifications",
+    "dtc_code": "TORQUE_SPECS",
+    "title": "OEM Fastener & Bolt Torque Specifications Master Sheet",
+    "content": "Official Fastener Torque Specifications: Spark Plugs: 23 Nm (dry thread, gap 0.75 mm). Ignition Coil / Injector Bracket Fasteners: 8 Nm - 13 Nm. Common Rail Fuel Line Unions: 28 Nm. Charge Air Piping Clamps: 5.5 Nm. EGR Valve Mounting Bolts: 22 Nm. Exhaust Manifold Bolts: 35 Nm. Cylinder Head Bolts: Step 1: 40 Nm, Step 2: +90 degrees, Step 3: +90 degrees in spiral pattern from center. Oil Pan Drain Plug: 25 Nm. Intake Manifold Bolts: 18 Nm."
+  },
+  {
+    "id": "i6_physics_specs",
+    "category": "Engine Architecture & Kinematic Physics",
+    "dtc_code": "I6_SPECS",
+    "title": "Inline-6 (I6) Engine Physics, Firing Order & Kinematic Equations",
+    "content": "Engine Architecture: 6.7L Diesel Inline-6 (I6). Firing Order: 1-5-3-6-2-4 across 720 degrees 4-stroke cycle (120 degrees interval per cylinder power stroke). Cylinder Power Index (CPI): Calculated from high-frequency crankshaft angular velocity acceleration derivative d(omega)/dt during expansion stroke. Stoichiometric Ratio: 14.5:1 (Diesel operates lean Lambda 1.2 to 2.5). Mass Airflow residual formula: m_dot = V_d * RPM * MAP * VE / (2 * R * T). Bank 1: Cylinders 1, 2, 3. Bank 2: Cylinders 4, 5, 6."
+  },
+  {
+    "id": "compression_testing_manual",
+    "category": "Diagnostic Testing Protocols",
+    "dtc_code": "COMPRESSION_TEST",
+    "title": "Engine Compression & Cylinder Leakdown Diagnostic Procedure",
+    "content": "Mechanical Dry Compression Test Procedure: 1. Disable fuel injection system and remove all 6 spark plugs / glow plugs. 2. Thread compression gauge into Cyl 1. Crank engine for 5 compression strokes (approx 4 seconds). 3. Nominal Standard: Minimum 175 PSI across all cylinders. Maximum allowable variance between cylinders is <10%. 4. If low (<150 PSI), perform Wet Compression Test by adding 10ml motor oil into combustion chamber. If pressure rises, piston rings are worn. If pressure stays low, valves or head gasket breached."
+  },
+  {
+    "id": "system_hardware_stack",
+    "category": "AI Execution Stack",
+    "dtc_code": "HARDWARE_STACK",
+    "title": "PyTorch CUDA GPU & RAG Architecture Details",
+    "content": "AI Execution Stack: Multi-class XGBoost + Random Forest ensemble with Platt-scaled confidence calibration (0-100%). Neural Physics PINN model built on PyTorch CUDA GPU acceleration (auto-detects NVIDIA GPUs). RAG Vector Engine uses ChromaDB / SentenceTransformers (all-MiniLM-L6-v2) for OEM manual semantic retrieval. Local LLM: Hugging Face Qwen 2.5 Coder 1.5B / TinyLlama."
   }
 ]

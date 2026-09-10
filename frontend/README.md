@@ -37,3 +37,4 @@ To start the backend in the backend folder:
 cd ../backend
 python -m uvicorn app.main:app --reload --port 8000
 ```
+

@@ -7,7 +7,14 @@ export default function InteractiveChat({ diagnosticContext }) {
     {
       id: 1,
       sender: 'bot',
-      text: 'Hello! I am your Inline-6 Automotive RAG Diagnostic Expert. You can upload an ECU log file directly here or ask me any diagnostic question about torque specs, part numbers, or thermodynamic physics!'
+      text: `### 🤖 Welcome to the Inline-6 RAG AI Diagnostic Assistant!
+
+I am your domain-trained automotive AI diagnostic expert. Ask me anything about:
+- **Fastener & Bolt Torque Specs** (Spark plugs, cylinder head, manifold, fuel rail, clamps)
+- **SAE OBD-II Fault Codes** (P0300-P0306 misfires, P0299 boost leak, P0101 MAF drift, P0401 EGR, P0087 HPFP, P0217 head gasket)
+- **Diagnostic Procedures** (Compression tests, electrical pinout resistance, component swap tests, smoke leak testing)
+- **I6 Kinematic Physics & Equations** (120° firing order balance, CPI index, ideal gas volume airflow, stoichiometry)
+- **AI Hardware & Execution Stack** (PyTorch CUDA GPU acceleration, Hugging Face LLM, XGBoost ensemble)`
     }
   ]);
   const [input, setInput] = useState('');
@@ -88,24 +95,115 @@ export default function InteractiveChat({ diagnosticContext }) {
     }
   };
 
-  const renderMessageText = (text) => {
-    const lines = text.split('\n');
-    return lines.map((line, idx) => {
-      if (line.startsWith('🔴 ') || line.startsWith('🟢 ')) {
-        return <div key={idx} className="font-bold text-white mb-2 text-sm">{line}</div>;
+  const renderFormattedText = (rawText) => {
+    // Process inline bold **text** and code `code`
+    const parts = rawText.split(/(\*\*.*?\*\*|`.*?`)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} className="font-bold text-white">{part.slice(2, -2)}</strong>;
       }
-      if (line.startsWith('- ')) {
-        return <li key={idx} className="ml-4 list-disc text-xs text-gray-200 my-1">{line.replace('- ', '')}</li>;
+      if (part.startsWith('`') && part.endsWith('`')) {
+        return <code key={i} className="bg-cyan-950/80 text-cyan-300 font-mono text-[11px] px-1.5 py-0.5 rounded border border-cyan-500/30">{part.slice(1, -1)}</code>;
       }
-      if (line.startsWith('*') && line.endsWith('*')) {
-        return <div key={idx} className="italic text-cyan-300 text-xs my-1">{line.replace(/\*/g, '')}</div>;
-      }
-      return <p key={idx} className="text-xs text-gray-200 my-1">{line}</p>;
+      return part;
     });
   };
 
+  const renderMessageText = (text) => {
+    const lines = text.split('\n');
+    let inTable = false;
+    let tableRows = [];
+
+    const rendered = [];
+
+    lines.forEach((line, idx) => {
+      const trimmed = line.trim();
+
+      // Check table lines
+      if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+        inTable = true;
+        if (!trimmed.includes('---')) { // Skip separator row
+          const cells = trimmed.split('|').slice(1, -1).map(c => c.trim());
+          tableRows.push(cells);
+        }
+        return;
+      } else if (inTable) {
+        // Flush table
+        inTable = false;
+        if (tableRows.length > 0) {
+          const header = tableRows[0];
+          const rows = tableRows.slice(1);
+          rendered.push(
+            <div key={`table-${idx}`} className="my-3 overflow-x-auto border border-[#30363d] rounded-lg">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-[#161b22] text-cyan-400 border-b border-[#30363d]">
+                    {header.map((h, i) => <th key={i} className="p-2 font-semibold">{renderFormattedText(h)}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((r, ri) => (
+                    <tr key={ri} className="border-b border-[#30363d]/50 hover:bg-cyan-500/5">
+                      {r.map((c, ci) => <td key={ci} className="p-2 text-gray-300">{renderFormattedText(c)}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+          tableRows = [];
+        }
+      }
+
+      if (trimmed.startsWith('### ')) {
+        rendered.push(<h3 key={idx} className="text-sm font-bold text-cyan-400 mt-3 mb-1.5 flex items-center gap-1.5">{renderFormattedText(trimmed.replace('### ', ''))}</h3>);
+      } else if (trimmed.startsWith('#### ')) {
+        rendered.push(<h4 key={idx} className="text-xs font-bold text-white mt-2.5 mb-1">{renderFormattedText(trimmed.replace('#### ', ''))}</h4>);
+      } else if (trimmed.startsWith('## ')) {
+        rendered.push(<h2 key={idx} className="text-base font-bold text-cyan-300 mt-3 mb-2">{renderFormattedText(trimmed.replace('## ', ''))}</h2>);
+      } else if (trimmed.startsWith('🔴 ') || trimmed.startsWith('🟢 ')) {
+        rendered.push(<div key={idx} className="font-bold text-white mb-2 text-sm">{renderFormattedText(trimmed)}</div>);
+      } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        rendered.push(<li key={idx} className="ml-4 list-disc text-xs text-gray-200 my-1">{renderFormattedText(trimmed.substring(2))}</li>);
+      } else if (/^\d+\.\s/.test(trimmed)) {
+        rendered.push(<div key={idx} className="ml-2 font-medium text-xs text-cyan-200 my-1">{renderFormattedText(trimmed)}</div>);
+      } else if (trimmed.startsWith('*') && trimmed.endsWith('*')) {
+        rendered.push(<div key={idx} className="italic text-cyan-300 text-xs my-1 bg-cyan-500/10 p-2 rounded-lg border border-cyan-500/20">{renderFormattedText(trimmed.replace(/\*/g, ''))}</div>);
+      } else if (trimmed === '---') {
+        rendered.push(<hr key={idx} className="border-[#30363d] my-3" />);
+      } else if (trimmed.length > 0) {
+        rendered.push(<p key={idx} className="text-xs text-gray-200 my-1.5 leading-relaxed">{renderFormattedText(trimmed)}</p>);
+      }
+    });
+
+    if (inTable && tableRows.length > 0) {
+      const header = tableRows[0];
+      const rows = tableRows.slice(1);
+      rendered.push(
+        <div key="table-end" className="my-3 overflow-x-auto border border-[#30363d] rounded-lg">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-[#161b22] text-cyan-400 border-b border-[#30363d]">
+                {header.map((h, i) => <th key={i} className="p-2 font-semibold">{renderFormattedText(h)}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, ri) => (
+                <tr key={ri} className="border-b border-[#30363d]/50 hover:bg-cyan-500/5">
+                  {r.map((c, ci) => <td key={ci} className="p-2 text-gray-300">{renderFormattedText(c)}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    return rendered;
+  };
+
   return (
-    <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-5 shadow-xl flex flex-col h-[75vh] max-w-5xl mx-auto">
+    <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-5 shadow-xl flex flex-col h-[78vh] max-w-5xl mx-auto">
       {/* Chat Header */}
       <div className="flex items-center justify-between pb-3 border-b border-[#30363d]">
         <div className="flex items-center gap-3">
@@ -117,7 +215,7 @@ export default function InteractiveChat({ diagnosticContext }) {
               Conversational RAG AI Diagnostic Expert
             </h2>
             <p className="text-xs text-gray-400 mt-0.5">
-              Upload ECU telemetry files directly in chat or ask follow-up repair questions.
+              Powered by RAG OEM Knowledge Base & Active ECU Physics Analytics
             </p>
           </div>
         </div>
@@ -141,7 +239,7 @@ export default function InteractiveChat({ diagnosticContext }) {
             }`}>
               {m.sender === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
             </div>
-            <div className={`p-4 rounded-2xl max-w-[82%] leading-relaxed shadow-md ${
+            <div className={`p-4 rounded-2xl max-w-[85%] leading-relaxed shadow-md ${
               m.sender === 'user'
                 ? 'bg-cyan-600/25 text-white border border-cyan-500/40 rounded-tr-none'
                 : 'bg-[#0d1117] text-gray-200 border border-[#30363d] rounded-tl-none'
@@ -154,14 +252,47 @@ export default function InteractiveChat({ diagnosticContext }) {
         {loading && (
           <div className="flex items-center gap-2 text-xs text-cyan-400 italic bg-cyan-500/10 border border-cyan-500/20 p-3 rounded-xl max-w-xs">
             <Sparkles className="w-4 h-4 animate-spin text-cyan-400" />
-            <span>AI Expert analyzing telemetry & technical manual...</span>
+            <span>AI Expert querying RAG vector store & manual database...</span>
           </div>
         )}
         <div ref={chatEndRef} />
       </div>
 
+      {/* Quick Prompt Suggestions */}
+      <div className="flex items-center gap-2 py-2 overflow-x-auto text-[11px] no-scrollbar border-t border-[#30363d]/50">
+        <span className="text-gray-500 shrink-0 font-medium">Quick Prompts:</span>
+        <button
+          type="button"
+          onClick={() => setInput("What are the exact torque specs for spark plugs and cylinder head bolts?")}
+          className="bg-[#0d1117] hover:bg-cyan-500/20 hover:text-cyan-300 text-gray-400 border border-[#30363d] px-2.5 py-1 rounded-lg shrink-0 transition-colors"
+        >
+          🔩 Torque Specs
+        </button>
+        <button
+          type="button"
+          onClick={() => setInput("How do I perform a compression test and component swap test for cylinder 3 misfire?")}
+          className="bg-[#0d1117] hover:bg-cyan-500/20 hover:text-cyan-300 text-gray-400 border border-[#30363d] px-2.5 py-1 rounded-lg shrink-0 transition-colors"
+        >
+          🧪 Cylinder 3 Repair
+        </button>
+        <button
+          type="button"
+          onClick={() => setInput("Explain the 120 degree firing order and Cylinder Power Index (CPI) formula.")}
+          className="bg-[#0d1117] hover:bg-cyan-500/20 hover:text-cyan-300 text-gray-400 border border-[#30363d] px-2.5 py-1 rounded-lg shrink-0 transition-colors"
+        >
+          📐 I6 Physics & Firing Order
+        </button>
+        <button
+          type="button"
+          onClick={() => setInput("What causes P0299 boost leak and P0101 MAF drift?")}
+          className="bg-[#0d1117] hover:bg-cyan-500/20 hover:text-cyan-300 text-gray-400 border border-[#30363d] px-2.5 py-1 rounded-lg shrink-0 transition-colors"
+        >
+          💨 P0299 & P0101 Faults
+        </button>
+      </div>
+
       {/* Input Form with File Attachment Button */}
-      <form onSubmit={handleSend} className="flex items-center gap-2 border-t border-[#30363d] pt-3">
+      <form onSubmit={handleSend} className="flex items-center gap-2 pt-2">
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
@@ -183,7 +314,7 @@ export default function InteractiveChat({ diagnosticContext }) {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask a diagnostic question or attach an ECU file..."
+          placeholder="Ask a diagnostic question, torque spec, or attach an ECU file..."
           className="flex-1 bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 shadow-inner"
         />
 
