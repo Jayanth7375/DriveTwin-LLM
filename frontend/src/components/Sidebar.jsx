@@ -1,4 +1,6 @@
 import React from 'react';
+import { Sidebar as AceternitySidebar, SidebarBody, SidebarLink, useSidebar } from './ui/sidebar';
+import { motion } from 'framer-motion';
 import { 
   FileSpreadsheet, 
   Activity, 
@@ -6,78 +8,80 @@ import {
   Sparkles, 
   MessageSquare, 
   Gauge, 
-  Box
+  Box,
+  Sun,
+  Moon
 } from 'lucide-react';
 
-export default function Sidebar({ activeTab, setActiveTab, hardwareInfo }) {
+
+const LogoText = () => {
+  const { open, animate } = useSidebar();
+  return (
+    <motion.div
+      animate={{
+        display: animate ? (open ? "block" : "none") : "block",
+        opacity: animate ? (open ? 1 : 0) : 1,
+      }}
+      className="overflow-hidden whitespace-nowrap font-sans"
+    >
+      <h1 className="text-sm font-bold tracking-wide dark:text-white leading-tight bg-clip-text text-transparent bg-[linear-gradient(to_right,#3264AD,#00008b,red)] dark:bg-none dark:text-white dark:bg-transparent">DIESEL I6 ENGINE</h1>
+      <p className="text-[10px] text-cyan-600 dark:text-cyan-400 font-mono font-semibold">LLM Diagnostic Suite</p>
+    </motion.div>
+  );
+};
+
+export default function Sidebar({ activeTab, setActiveTab, hardwareInfo, isCollapsed, setIsCollapsed, isDarkMode, setIsDarkMode }) {
   const navItems = [
-    { id: 'overview', label: 'Diagnostics Overview', icon: FileSpreadsheet, badge: 'Main' },
-    { id: 'llm', label: 'RAG LLM Repair Report', icon: Sparkles, badge: 'AI Report' },
-    { id: 'digitaltwin', label: '3D Engine Digital Twin', icon: Box, badge: '3D WebGL' },
-    { id: 'schematic', label: 'Engine Visual HUD', icon: Activity, badge: 'Interactive' },
-    { id: 'physics', label: 'Physics & PINN Metrics', icon: BarChart3, badge: 'PyTorch' },
-    { id: 'chat', label: 'Mechanic AI Chat', icon: MessageSquare, badge: 'Q&A' },
+    { id: 'overview', label: 'Diagnostics Overview', icon: <FileSpreadsheet className="class-for-icon" /> },
+    { id: 'llm', label: 'RAG LLM Repair Report', icon: <Sparkles className="class-for-icon" /> },
+    { id: 'digitaltwin', label: '3D Engine Digital Twin', icon: <Box className="class-for-icon" /> },
+    { id: 'schematic', label: 'Engine Visual HUD', icon: <Activity className="class-for-icon" /> },
+    { id: 'physics', label: 'Physics & PINN Metrics', icon: <BarChart3 className="class-for-icon" /> },
+    { id: 'chat', label: 'Mechanic AI Chat', icon: <MessageSquare className="class-for-icon" /> },
   ];
 
   return (
-    <aside className="w-64 bg-[#161b22] border-r border-[#30363d] flex flex-col justify-between h-screen sticky top-0 shrink-0 select-none shadow-xl z-50 rounded-none">
-      <div>
-        {/* Top App Branding */}
-        <div className="p-4 border-b border-[#30363d] flex items-center gap-3 bg-[#0d1117]/50 rounded-none">
-          <div className="p-2 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shrink-0 rounded-none">
-            <Gauge className="w-6 h-6 animate-pulse" />
+    <AceternitySidebar open={!isCollapsed} setOpen={(val) => setIsCollapsed(!val)}>
+      <SidebarBody className="justify-between gap-10 h-screen bg-white dark:bg-[#161b22] border-r border-gray-200 dark:border-[#30363d]">
+        <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="flex items-center gap-2 py-2">
+            <div className="flex items-center justify-center bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shrink-0 rounded-lg w-6 h-6">
+              <Gauge className="w-4 h-4 animate-pulse" />
+            </div>
+            <LogoText />
           </div>
-          <div>
-            <h1 className="text-sm font-bold tracking-wide text-white leading-tight">
-              DIESEL I6 ENGINE
-            </h1>
-            <p className="text-[10px] text-cyan-400 font-mono font-semibold">
-              LLM Diagnostic Suite
-            </p>
+          
+          <div className="mt-8 flex flex-col gap-2">
+            {navItems.map((item) => (
+              <SidebarLink 
+                key={item.id} 
+                link={{
+                  label: item.label,
+                  href: "#",
+                  icon: React.cloneElement(item.icon, { 
+                    className: `h-5 w-5 flex-shrink-0 transition-colors ${activeTab === item.id ? 'text-red-600 dark:text-cyan-400' : 'text-[#3264AD] group-hover/sidebar:text-[#00008b] dark:text-neutral-400'}` 
+                  })
+                }} 
+                onClick={() => setActiveTab(item.id)}
+                className={activeTab === item.id ? "bg-gray-100 dark:bg-[#21262d] rounded-lg text-red-600 dark:text-cyan-400" : "rounded-lg text-[#3264AD] hover:text-[#00008b] dark:text-neutral-400"}
+              />
+            ))}
           </div>
         </div>
 
-        {/* Vertical Navigation Items */}
-        <nav className="p-3 space-y-1 mt-2 rounded-none">
-          <div className="text-[10px] font-bold text-gray-500 px-3 mb-1 uppercase tracking-wider">
-            Diagnostic Modules
-          </div>
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold transition-all rounded-none ${
-                  isActive
-                    ? 'bg-cyan-600 text-white shadow-md border border-cyan-400'
-                    : 'text-gray-400 hover:text-white hover:bg-[#21262d]'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-cyan-400'}`} />
-                  <span>{item.label}</span>
-                </div>
-                {item.badge && (
-                  <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-none ${
-                    isActive
-                      ? 'bg-white/20 text-white'
-                      : 'bg-[#0d1117] text-gray-400 border border-[#30363d]'
-                  }`}>
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Footer Branding */}
-      <div className="p-4 border-t border-[#30363d] bg-[#0d1117]/50 text-center text-[10px] font-mono text-gray-500 rounded-none">
-        Diesel I6 Diagnostic Suite v1.0
-      </div>
-    </aside>
+        <div>
+           <SidebarLink 
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              link={{
+                label: isDarkMode ? "Light Mode" : "Dark Mode",
+                href: "#",
+                icon: isDarkMode 
+                  ? <Sun className="text-gray-500 dark:text-neutral-400 h-5 w-5 flex-shrink-0" /> 
+                  : <Moon className="text-gray-500 dark:text-neutral-400 h-5 w-5 flex-shrink-0" />
+              }}
+           />
+        </div>
+      </SidebarBody>
+    </AceternitySidebar>
   );
 }

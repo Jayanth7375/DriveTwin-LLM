@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { 
   Activity, 
   Gauge, 
@@ -81,14 +81,14 @@ export default function LiveTelemetrySheet({ telemetryPreview, latestSensors, ph
     { key: "Wastegate_Duty", name: "Wastegate Duty Cycle", unit: "%", icon: Zap, color: "text-cyan-400" },
     { key: "Lambda_B1", name: "Bank 1 Diesel Lambda", unit: "Ratio", icon: Droplets, color: "text-emerald-400" },
     { key: "Lambda_B2", name: "Bank 2 Diesel Lambda", unit: "Ratio", icon: Droplets, color: "text-emerald-400" },
-    { key: "Coolant_Temp", name: "Coolant Temperature", unit: "°C", icon: Flame, color: "text-amber-400" },
-    { key: "Oil_Temp", name: "Oil Temperature", unit: "°C", icon: Flame, color: "text-amber-400" },
-    { key: "Crank_Accel_C1", name: "Cylinder 1 Acceleration", unit: "rad/s²", icon: TrendingUp, color: "text-cyan-400" },
-    { key: "Crank_Accel_C2", name: "Cylinder 2 Acceleration", unit: "rad/s²", icon: TrendingUp, color: "text-cyan-400" },
-    { key: "Crank_Accel_C3", name: "Cylinder 3 Acceleration", unit: "rad/s²", icon: TrendingUp, color: "text-cyan-400" },
-    { key: "Crank_Accel_C4", name: "Cylinder 4 Acceleration", unit: "rad/s²", icon: TrendingUp, color: "text-cyan-400" },
-    { key: "Crank_Accel_C5", name: "Cylinder 5 Acceleration", unit: "rad/s²", icon: TrendingUp, color: "text-cyan-400" },
-    { key: "Crank_Accel_C6", name: "Cylinder 6 Acceleration", unit: "rad/s²", icon: TrendingUp, color: "text-cyan-400" },
+    { key: "Coolant_Temp", name: "Coolant Temperature", unit: "┬░C", icon: Flame, color: "text-amber-400" },
+    { key: "Oil_Temp", name: "Oil Temperature", unit: "┬░C", icon: Flame, color: "text-amber-400" },
+    { key: "Crank_Accel_C1", name: "Cylinder 1 Acceleration", unit: "rad/s┬▓", icon: TrendingUp, color: "text-cyan-400" },
+    { key: "Crank_Accel_C2", name: "Cylinder 2 Acceleration", unit: "rad/s┬▓", icon: TrendingUp, color: "text-cyan-400" },
+    { key: "Crank_Accel_C3", name: "Cylinder 3 Acceleration", unit: "rad/s┬▓", icon: TrendingUp, color: "text-cyan-400" },
+    { key: "Crank_Accel_C4", name: "Cylinder 4 Acceleration", unit: "rad/s┬▓", icon: TrendingUp, color: "text-cyan-400" },
+    { key: "Crank_Accel_C5", name: "Cylinder 5 Acceleration", unit: "rad/s┬▓", icon: TrendingUp, color: "text-cyan-400" },
+    { key: "Crank_Accel_C6", name: "Cylinder 6 Acceleration", unit: "rad/s┬▓", icon: TrendingUp, color: "text-cyan-400" },
   ];
 
   // Renders a smooth animated SVG mini sparkline for a given sensor key
@@ -141,17 +141,17 @@ export default function LiveTelemetrySheet({ telemetryPreview, latestSensors, ph
     : `${(totalRows * 0.1).toFixed(1)}s`;
 
   return (
-    <div className="bg-[#161b22] border border-[#30363d] rounded-none p-5 shadow-sm space-y-5">
+    <div className="bg-white/60 dark:bg-[#161b22]/60 backdrop-blur-xl border border-gray-200/50 dark:border-white/10 rounded-3xl p-6 shadow-2xl shadow-black/5 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/5 transition-all duration-300 space-y-5">
       {/* Header Banner & Playback Stream Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-[#30363d] pb-3 gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-200/50 dark:border-white/10 pb-3 gap-3">
         <div className="flex items-center gap-2">
           <LineChart className="w-5 h-5 text-cyan-400" />
           <div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+            <h3 className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-500 dark:from-white dark:to-gray-400 uppercase tracking-wider font-mono">
               Live ECU Telemetry Sensor Grid & Dynamic Oscilloscope
             </h3>
-            <span className="text-[11px] text-gray-400 font-mono">
-              Dynamic Row-by-Row Playback from Telemetry Log • Timestamp Stream
+            <span className="text-[11px] text-gray-500 dark:text-gray-400 font-mono">
+              Dynamic Row-by-Row Playback from Telemetry Log ΓÇó Timestamp Stream
             </span>
           </div>
         </div>
@@ -160,7 +160,7 @@ export default function LiveTelemetrySheet({ telemetryPreview, latestSensors, ph
         <div className="flex items-center gap-2 text-xs font-mono">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold flex items-center gap-1.5 transition-colors border border-cyan-400 rounded-none shadow"
+            className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 shadow-lg hover:shadow-emerald-500/25 hover:-translate-y-0.5 border-transparent text-white font-bold flex items-center gap-1.5 transition-colors border border-cyan-400 rounded-2xl shadow"
           >
             {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
             <span>{isPlaying ? 'PAUSE STREAM' : 'PLAY LIVE'}</span>
@@ -172,13 +172,13 @@ export default function LiveTelemetrySheet({ telemetryPreview, latestSensors, ph
               setIsPlaying(true);
               if (telemetryPreview && telemetryPreview[0]) setHistory([telemetryPreview[0]]);
             }}
-            className="p-1.5 bg-[#0d1117] hover:bg-gray-800 text-gray-300 border border-[#30363d] transition-colors rounded-none"
+            className="p-1.5 bg-[#0d1117] hover:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200/50 dark:border-white/10 transition-colors rounded-2xl"
             title="Replay Telemetry Stream"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
 
-          <div className="flex items-center bg-[#0d1117] border border-[#30363d] px-2 py-1 text-[11px] text-cyan-300 gap-1 rounded-none">
+          <div className="flex items-center bg-white/40 dark:bg-[#0d1117]/40 backdrop-blur-md border border-gray-200/50 dark:border-white/5 hover:border-gray-300/50 dark:hover:border-white/10 transition-colors duration-300 border-gray-200/50 dark:border-white/10 px-2 py-1 text-[11px] text-cyan-300 gap-1 rounded-2xl">
             <Clock className="w-3.5 h-3.5 text-cyan-400" />
             <span>{currentTime} / {totalTime}</span>
           </div>
@@ -186,7 +186,7 @@ export default function LiveTelemetrySheet({ telemetryPreview, latestSensors, ph
           <select
             value={speedMs}
             onChange={(e) => setSpeedMs(Number(e.target.value))}
-            className="bg-[#0d1117] border border-[#30363d] px-2 py-1 text-[11px] text-gray-200 font-mono focus:outline-none focus:border-cyan-400 rounded-none"
+            className="bg-white/40 dark:bg-[#0d1117]/40 backdrop-blur-md border border-gray-200/50 dark:border-white/5 hover:border-gray-300/50 dark:hover:border-white/10 transition-colors duration-300 border-gray-200/50 dark:border-white/10 px-2 py-1 text-[11px] text-gray-700 dark:text-gray-200 font-mono focus:outline-none focus:border-cyan-400 rounded-2xl"
           >
             <option value={150}>0.5x Speed</option>
             <option value={80}>1x Normal</option>
@@ -194,7 +194,7 @@ export default function LiveTelemetrySheet({ telemetryPreview, latestSensors, ph
             <option value={10}>Max Speed</option>
           </select>
 
-          <span className={`px-2.5 py-1 flex items-center gap-1.5 rounded-none font-bold border ${
+          <span className={`px-2.5 py-1 flex items-center gap-1.5 rounded-2xl font-bold border ${
             isPlaying 
               ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30 animate-pulse' 
               : 'text-amber-400 bg-amber-500/10 border-amber-500/30'
@@ -206,7 +206,7 @@ export default function LiveTelemetrySheet({ telemetryPreview, latestSensors, ph
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-[#0d1117] h-1.5 border border-[#30363d] overflow-hidden relative">
+      <div className="w-full bg-[#0d1117] h-1.5 border border-gray-200/50 dark:border-white/10 overflow-hidden relative">
         <div 
           className="bg-cyan-500 h-full transition-all duration-75"
           style={{ width: `${progressPercent}%` }}
@@ -214,28 +214,28 @@ export default function LiveTelemetrySheet({ telemetryPreview, latestSensors, ph
       </div>
 
       {/* Top Oscilloscope Moving Waveform Banner */}
-      <div className="bg-[#0d1117] border border-[#30363d] p-4 rounded-none space-y-2">
+      <div className="bg-white/40 dark:bg-[#0d1117]/40 backdrop-blur-md border border-gray-200/50 dark:border-white/5 hover:border-gray-300/50 dark:hover:border-white/10 transition-colors duration-300 border-gray-200/50 dark:border-white/10 p-4 rounded-2xl space-y-2">
         <div className="flex items-center justify-between text-xs font-mono">
           <span className="text-cyan-400 font-bold flex items-center gap-1.5">
             <TrendingUp className="w-4 h-4 text-cyan-400" />
             Multi-Channel Telemetry Waveform Oscilloscope (RPM & Air Intake Dynamics)
           </span>
-          <span className="text-gray-400 text-[10px]">Rolling 30-Point Signal Window ({progressPercent}% Completed)</span>
+          <span className="text-gray-500 dark:text-gray-400 text-[10px]">Rolling 30-Point Signal Window ({progressPercent}% Completed)</span>
         </div>
 
-        <div className="h-16 w-full flex items-center justify-center bg-black/40 border border-[#30363d] p-2 overflow-hidden relative">
+        <div className="h-16 w-full flex items-center justify-center bg-black/40 border border-gray-200/50 dark:border-white/10 p-2 overflow-hidden relative">
           <div className="absolute inset-0 bg-grid-pattern opacity-10" />
           <div className="w-full flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-[10px] text-gray-400 font-mono block">Engine Speed Signal (RPM)</span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block">Engine Speed Signal (RPM)</span>
               {renderSparkline("RPM", "#38bdf8")}
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] text-gray-400 font-mono block">VGT Boost Pressure (kPa)</span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block">VGT Boost Pressure (kPa)</span>
               {renderSparkline("Boost_Pressure", "#34d399")}
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] text-gray-400 font-mono block">Cylinder 3 Acceleration</span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block">Cylinder 3 Acceleration</span>
               {renderSparkline("Crank_Accel_C3", "#f87171")}
             </div>
           </div>
@@ -271,31 +271,31 @@ export default function LiveTelemetrySheet({ telemetryPreview, latestSensors, ph
           return (
             <div 
               key={s.key} 
-              className={`p-3.5 bg-[#0d1117] border flex flex-col justify-between transition-all rounded-none ${
+              className={`p-3.5 bg-white/40 dark:bg-[#0d1117]/40 backdrop-blur-md border border-gray-200/50 dark:border-white/5 hover:border-gray-300/50 dark:hover:border-white/10 transition-colors duration-300 flex flex-col justify-between transition-all rounded-2xl ${
                 status === "FAULT"
                   ? "border-red-500/50 bg-red-950/20 text-white shadow-lg shadow-red-500/10"
                   : status === "WARNING"
                   ? "border-amber-500/50 bg-amber-950/20 text-white"
-                  : "border-[#30363d] hover:border-gray-500 text-gray-200"
+                  : "border-gray-200/50 dark:border-white/10 hover:border-gray-500 text-gray-700 dark:text-gray-200"
               }`}
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
                   <Icon className={`w-4 h-4 ${s.color}`} />
-                  <span className="text-[11px] font-bold text-gray-300 font-mono truncate">{s.name}</span>
+                  <span className="text-[11px] font-bold text-gray-600 dark:text-gray-300 font-mono truncate">{s.name}</span>
                 </div>
                 {status === "FAULT" && (
-                  <span className="px-1.5 py-0.5 bg-red-500/20 text-red-300 text-[9px] font-mono font-bold border border-red-500/40 rounded-none">
+                  <span className="px-1.5 py-0.5 bg-red-500/20 text-red-300 text-[9px] font-mono font-bold border border-red-500/40 rounded-2xl">
                     FAULT
                   </span>
                 )}
                 {status === "WARNING" && (
-                  <span className="px-1.5 py-0.5 bg-amber-500/20 text-amber-300 text-[9px] font-mono font-bold border border-amber-500/40 rounded-none">
+                  <span className="px-1.5 py-0.5 bg-amber-500/20 text-amber-300 text-[9px] font-mono font-bold border border-amber-500/40 rounded-2xl">
                     DEGRADED
                   </span>
                 )}
                 {status === "NOMINAL" && (
-                  <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-[9px] font-mono font-bold border border-emerald-500/30 rounded-none">
+                  <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-[9px] font-mono font-bold border border-emerald-500/30 rounded-2xl">
                     OK
                   </span>
                 )}
@@ -305,7 +305,7 @@ export default function LiveTelemetrySheet({ telemetryPreview, latestSensors, ph
               <div className="flex items-end justify-between my-1">
                 <div>
                   <div className="text-xl font-mono font-black text-white">{displayVal}</div>
-                  <div className="text-[10px] text-gray-400 font-mono">{s.unit}</div>
+                  <div className="text-[10px] text-gray-500 dark:text-gray-400 font-mono">{s.unit}</div>
                 </div>
 
                 <div className="opacity-80">

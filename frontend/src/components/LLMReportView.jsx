@@ -19,7 +19,7 @@ export default function LLMReportView({ diagnosticReport }) {
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
         return (
-          <strong key={index} className="font-bold text-white">
+          <strong key={index} className="font-bold text-gray-900 dark:text-white">
             {part.slice(2, -2)}
           </strong>
         );
@@ -55,7 +55,7 @@ export default function LLMReportView({ diagnosticReport }) {
             isRed ? 'bg-red-950/20 border-red-500/40 text-red-300' : 'bg-emerald-950/20 border-emerald-500/40 text-emerald-300'
           }`}>
             {isRed ? <ShieldAlert className="w-6 h-6 shrink-0 text-red-400" /> : <CheckCircle2 className="w-6 h-6 shrink-0 text-emerald-400" />}
-            <h2 className="text-base font-bold text-white tracking-wide">
+            <h2 className="text-base font-bold text-gray-900 dark:text-white tracking-wide">
               {titleText}
             </h2>
           </div>
@@ -65,7 +65,7 @@ export default function LLMReportView({ diagnosticReport }) {
       else if (trimmed.startsWith('### ') || trimmed.startsWith('#### ')) {
         const hText = trimmed.replace(/^#{3,4}\s*/, '').replace(/^🧪\s*/, '').replace(/^🔍\s*/, '').replace(/^🛠️\s*/, '').replace(/^📊\s*/, '');
         elements.push(
-          <h3 key={idx} className="text-sm font-bold text-cyan-300 mt-5 mb-2.5 flex items-center gap-2 border-b border-[#30363d] pb-1.5">
+          <h3 key={idx} className="text-sm font-bold text-cyan-300 mt-5 mb-2.5 flex items-center gap-2 border-b border-gray-200 dark:border-[#30363d] pb-1.5">
             <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
             <span>{hText}</span>
           </h3>
@@ -75,7 +75,7 @@ export default function LLMReportView({ diagnosticReport }) {
       else if (/^\d+\.\s+/.test(trimmed)) {
         const stepContent = trimmed.replace(/^\d+\.\s+/, '');
         elements.push(
-          <div key={idx} className="p-3.5 bg-[#0d1117] border border-[#30363d] rounded-xl my-2.5 text-xs text-gray-200 leading-relaxed shadow-inner">
+          <div key={idx} className="p-3.5 bg-gray-50 dark:bg-[#0d1117] border border-gray-200 dark:border-[#30363d] rounded-xl my-2.5 text-xs text-gray-200 leading-relaxed shadow-inner">
             {formatInlineText(stepContent)}
           </div>
         );
@@ -84,7 +84,7 @@ export default function LLMReportView({ diagnosticReport }) {
       else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
         const bulletText = trimmed.replace(/^[-*]\s+/, '');
         elements.push(
-          <div key={idx} className="flex items-start gap-2 text-xs text-gray-300 my-1.5 ml-2 leading-relaxed">
+          <div key={idx} className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-300 my-1.5 ml-2 leading-relaxed">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0 mt-1.5" />
             <span>{formatInlineText(bulletText)}</span>
           </div>
@@ -92,12 +92,12 @@ export default function LLMReportView({ diagnosticReport }) {
       }
       // Divider
       else if (trimmed === '---') {
-        elements.push(<hr key={idx} className="border-[#30363d] my-4" />);
+        elements.push(<hr key={idx} className="border-gray-200 dark:border-[#30363d] my-4" />);
       }
       // Normal Paragraphs
       else {
         elements.push(
-          <p key={idx} className="text-xs text-gray-300 my-2 leading-relaxed">
+          <p key={idx} className="text-xs text-gray-600 dark:text-gray-300 my-2 leading-relaxed">
             {formatInlineText(trimmed)}
           </p>
         );
@@ -110,27 +110,27 @@ export default function LLMReportView({ diagnosticReport }) {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Main Formatted AI Report Container */}
-      <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 shadow-xl text-gray-200 space-y-2">
+      <div className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-xl p-6 shadow-xl text-gray-200 space-y-2">
         {renderFormattedReport(report_markdown)}
       </div>
 
       {/* Retrieved OEM Technical Manual References */}
       {retrieved_docs && retrieved_docs.length > 0 && (
-        <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-5 space-y-3">
-          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-[#30363d] pb-2">
+        <div className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-xl p-5 space-y-3">
+          <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-gray-200 dark:border-[#30363d] pb-2">
             <BookOpen className="w-4 h-4 text-cyan-400" />
             Retrieved OEM Technical Manual Documentation (Vector DB):
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
             {retrieved_docs.map((doc, idx) => (
-              <div key={idx} className="bg-[#0d1117] border border-[#30363d] p-3.5 rounded-xl text-xs space-y-1.5">
+              <div key={idx} className="bg-gray-50 dark:bg-[#0d1117] border border-gray-200 dark:border-[#30363d] p-3.5 rounded-xl text-xs space-y-1.5">
                 <div className="font-bold text-cyan-300 text-xs flex items-center justify-between">
                   <span>{doc.title}</span>
                   <span className="text-[9px] font-mono bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/30">
                     {doc.category}
                   </span>
                 </div>
-                <p className="text-gray-300 text-[11px] leading-relaxed">{doc.content}</p>
+                <p className="text-gray-600 dark:text-gray-300 text-[11px] leading-relaxed">{doc.content}</p>
               </div>
             ))}
           </div>
@@ -139,3 +139,5 @@ export default function LLMReportView({ diagnosticReport }) {
     </div>
   );
 }
+
+// Trigger JIT rebuild
